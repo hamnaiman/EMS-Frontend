@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
-import { FaPlus, FaUsers, FaTrash, FaArrowRight } from "react-icons/fa";
+import { FaPlus, FaUsers, FaTrash, FaArrowRight, FaSearch } from "react-icons/fa";
 import api from "../api/api";
 import JobRoleForm from "../components/JobRoleForm";
 import RelevantCandidatesTable from "../components/RelevantCandidatesTable";
@@ -15,6 +15,8 @@ const Recruitment = () => {
 
   const [topCandidates, setTopCandidates] = useState([]);
   const [topLoading, setTopLoading] = useState(true);
+
+  const [roleSearch, setRoleSearch] = useState("");
 
   const fetchRoles = async () => {
     setLoading(true);
@@ -66,6 +68,15 @@ const Recruitment = () => {
     }
   };
 
+  const filteredRoles = roles.filter((role) => {
+    const q = roleSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      role.title.toLowerCase().includes(q) ||
+      (role.requirements || "").toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div className="p-4 sm:p-6 md:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -86,6 +97,20 @@ const Recruitment = () => {
       {/* Auto-generated relevant candidates */}
       {!topLoading && <RelevantCandidatesTable candidates={topCandidates} />}
 
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-gray-700">Job roles</h3>
+        <div className="relative w-full max-w-xs">
+          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
+          <input
+            type="text"
+            value={roleSearch}
+            onChange={(e) => setRoleSearch(e.target.value)}
+            placeholder="Search job roles..."
+            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 transition"
+          />
+        </div>
+      </div>
+
       {loading ? (
         <div className="text-center py-14 text-gray-500">Loading job roles...</div>
       ) : error ? (
@@ -94,9 +119,13 @@ const Recruitment = () => {
         <div className="bg-white rounded-2xl shadow-sm p-10 text-center text-gray-500">
           No job roles yet. Create one to start screening CVs with AI.
         </div>
+      ) : filteredRoles.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-sm p-10 text-center text-gray-500">
+          No job roles match "{roleSearch}".
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {roles.map((role) => (
+          {filteredRoles.map((role) => (
             <div
               key={role._id}
               className="bg-white rounded-2xl shadow-sm hover:shadow-md transition p-5 flex flex-col"

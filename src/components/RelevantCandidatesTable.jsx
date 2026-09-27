@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { FaFileExcel, FaFilePdf, FaEnvelope, FaEdit } from "react-icons/fa";
+import { FaFileExcel, FaFilePdf, FaEnvelope, FaEdit, FaSearch } from "react-icons/fa";
 import EmailTemplateModal, { getSavedTemplate } from "./EmailTemplateModal";
 
 const fillTemplate = (template, candidate) => {
@@ -18,6 +18,17 @@ const fillTemplate = (template, candidate) => {
 
 const RelevantCandidatesTable = ({ candidates }) => {
   const [templateOpen, setTemplateOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filtered = candidates.filter((c) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (c.name || c.fileName || "").toLowerCase().includes(q) ||
+      (c.jobRole?.title || "").toLowerCase().includes(q) ||
+      (c.skills || []).some((skill) => skill.toLowerCase().includes(q))
+    );
+  });
 
   const handleEmail = (candidate) => {
     if (!candidate.email) return;
@@ -30,7 +41,7 @@ const RelevantCandidatesTable = ({ candidates }) => {
   };
 
   const exportToExcel = () => {
-    const rows = candidates.map((c) => ({
+    const rows = filtered.map((c) => ({
       Name: c.name || c.fileName,
       Email: c.email || "",
       Phone: c.phone || "",
@@ -52,7 +63,7 @@ const RelevantCandidatesTable = ({ candidates }) => {
     autoTable(doc, {
       startY: 22,
       head: [["Name", "Email", "Role", "Score", "Skills"]],
-      body: candidates.map((c) => [
+      body: filtered.map((c) => [
         c.name || c.fileName,
         c.email || "—",
         c.jobRole?.title || "—",
@@ -74,7 +85,17 @@ const RelevantCandidatesTable = ({ candidates }) => {
         <h3 className="text-sm font-semibold text-gray-700">
           Relevant candidates across your open roles
         </h3>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search candidates..."
+              className="pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 transition w-44 sm:w-56"
+            />
+          </div>
           <button
             onClick={() => setTemplateOpen(true)}
             className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 border border-gray-300 px-3 py-1.5 rounded-md transition"
@@ -96,6 +117,11 @@ const RelevantCandidatesTable = ({ candidates }) => {
         </div>
       </div>
 
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-sm p-8 text-center text-gray-500 text-sm">
+          No candidates match "{search}".
+        </div>
+      ) : (
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -108,7 +134,7 @@ const RelevantCandidatesTable = ({ candidates }) => {
             </tr>
           </thead>
           <tbody>
-            {candidates.map((c) => (
+            {filtered.map((c) => (
               <tr key={c._id} className="border-b border-gray-50 last:border-0">
                 <td className="px-4 py-3">
                   <div className="font-medium text-gray-900">{c.name || c.fileName}</div>
@@ -147,6 +173,7 @@ const RelevantCandidatesTable = ({ candidates }) => {
           </tbody>
         </table>
       </div>
+      )}
 
       <EmailTemplateModal open={templateOpen} onClose={() => setTemplateOpen(false)} />
     </div>
