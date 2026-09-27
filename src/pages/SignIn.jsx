@@ -49,7 +49,7 @@ const SignIn = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-200 to-gray-400 relative">
       {/* Top Header */}
-      <div className="w-full h-20 sm:h-24 bg-gray-800 shadow-md fixed top-0 left-0 z-10 flex items-center justify-center px-4">
+      <div className="w-full h-20 sm:h-24 bg-gray-900 shadow-sm fixed top-0 left-0 z-10 flex items-center justify-center px-4">
         <Link
           to="/"
           className="text-white text-lg sm:text-2xl font-bold tracking-wide text-center hover:text-gray-200 transition"
@@ -60,7 +60,7 @@ const SignIn = () => {
 
       {/* Centered Form */}
       <div className="flex justify-center items-center min-h-screen pt-28 sm:pt-32 pb-10 px-4">
-        <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-sm sm:max-w-md transform transition-all duration-300 hover:shadow-gray-500">
+        <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg w-full max-w-sm sm:max-w-md transition-shadow duration-300 hover:shadow-xl">
           <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-gray-800">
             Sign In
           </h2>
@@ -107,7 +107,7 @@ const SignIn = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gray-800 text-white py-2 rounded-md hover:bg-gray-700 transition duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-gray-900 text-white py-2.5 rounded-md font-medium hover:bg-gray-800 transition duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? "Signing In..." : "Sign In"}
             </button>

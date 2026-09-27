@@ -5,12 +5,16 @@ import Swal from "sweetalert2";
 import { FaPlus, FaUsers, FaTrash, FaArrowRight } from "react-icons/fa";
 import api from "../api/api";
 import JobRoleForm from "../components/JobRoleForm";
+import RelevantCandidatesTable from "../components/RelevantCandidatesTable";
 
 const Recruitment = () => {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [formOpen, setFormOpen] = useState(false);
+
+  const [topCandidates, setTopCandidates] = useState([]);
+  const [topLoading, setTopLoading] = useState(true);
 
   const fetchRoles = async () => {
     setLoading(true);
@@ -24,8 +28,22 @@ const Recruitment = () => {
     }
   };
 
+  const fetchTopCandidates = async () => {
+    setTopLoading(true);
+    try {
+      const res = await api.get("/recruitment/candidates/relevant");
+      setTopCandidates(res.data || []);
+    } catch (err) {
+      // Non-critical section — fail quietly and just show nothing.
+      setTopCandidates([]);
+    } finally {
+      setTopLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchRoles();
+    fetchTopCandidates();
   }, []);
 
   const handleDelete = async (role) => {
@@ -42,6 +60,7 @@ const Recruitment = () => {
     try {
       await api.delete(`/recruitment/roles/${role._id}`);
       fetchRoles();
+      fetchTopCandidates();
     } catch (err) {
       Swal.fire({ icon: "error", title: "Could not delete", text: err.response?.data?.msg || "" });
     }
@@ -51,25 +70,28 @@ const Recruitment = () => {
     <div className="p-4 sm:p-6 md:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">AI Recruitment Screening</h2>
+          <h2 className="text-2xl font-bold text-gray-900">AI Recruitment Screening</h2>
           <p className="text-sm text-gray-500 mt-1">
             Create a role, upload CVs, and let AI rank candidates by fit.
           </p>
         </div>
         <button
           onClick={() => setFormOpen(true)}
-          className="inline-flex items-center justify-center gap-2 bg-gray-800 text-white px-4 py-2.5 rounded-md hover:bg-gray-700 transition text-sm font-medium"
+          className="inline-flex items-center justify-center gap-2 bg-gray-900 text-white px-4 py-2.5 rounded-md hover:bg-gray-800 transition text-sm font-medium"
         >
           <FaPlus /> New Job Role
         </button>
       </div>
+
+      {/* Auto-generated relevant candidates */}
+      {!topLoading && <RelevantCandidatesTable candidates={topCandidates} />}
 
       {loading ? (
         <div className="text-center py-14 text-gray-500">Loading job roles...</div>
       ) : error ? (
         <div className="text-center py-14 text-red-500">{error}</div>
       ) : roles.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-md p-10 text-center text-gray-500">
+        <div className="bg-white rounded-2xl shadow-sm p-10 text-center text-gray-500">
           No job roles yet. Create one to start screening CVs with AI.
         </div>
       ) : (
@@ -77,10 +99,10 @@ const Recruitment = () => {
           {roles.map((role) => (
             <div
               key={role._id}
-              className="bg-white rounded-2xl shadow-md p-5 hover:shadow-lg transition flex flex-col"
+              className="bg-white rounded-2xl shadow-sm hover:shadow-md transition p-5 flex flex-col"
             >
               <div className="flex items-start justify-between gap-2 mb-2">
-                <h3 className="font-semibold text-gray-800">{role.title}</h3>
+                <h3 className="font-semibold text-gray-900">{role.title}</h3>
                 <button
                   onClick={() => handleDelete(role)}
                   aria-label="Delete role"
@@ -109,7 +131,7 @@ const Recruitment = () => {
         </div>
       )}
 
-      <JobRoleForm open={formOpen} onClose={() => setFormOpen(false)} onSuccess={fetchRoles} />
+      <JobRoleForm open={formOpen} onClose={() => setFormOpen(false)} onSuccess={() => { fetchRoles(); fetchTopCandidates(); }} />
     </div>
   );
 };

@@ -53,7 +53,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Nav */}
-      <header className="bg-gray-800 shadow-md">
+      <header className="bg-gray-900 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center font-bold text-gray-800">
@@ -79,7 +79,7 @@ const HomePage = () => {
       </header>
 
       {/* Hero */}
-      <section className="bg-gradient-to-b from-gray-800 to-gray-700 text-white">
+      <section className="bg-gradient-to-b from-gray-900 to-gray-800 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16 text-center">
           <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight">
             Hiring and HR, run from one calm dashboard
@@ -128,9 +128,9 @@ const HomePage = () => {
           {features.map(({ icon: Icon, title, text }) => (
             <div
               key={title}
-              className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1"
+              className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition transform hover:-translate-y-1"
             >
-              <div className="w-11 h-11 rounded-xl bg-gray-800 text-white flex items-center justify-center text-lg mb-4">
+              <div className="w-11 h-11 rounded-xl bg-gray-900 text-white flex items-center justify-center text-lg mb-4">
                 <Icon />
               </div>
               <h3 className="font-semibold text-gray-800 mb-2">{title}</h3>
@@ -141,7 +141,7 @@ const HomePage = () => {
       </section>
 
       {/* CTA */}
-      <section className="bg-gray-800">
+      <section className="bg-gray-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-14 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white">
             Your team is worth organizing properly
